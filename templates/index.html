@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-129600615-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+
+      gtag('js', new Date());
+
+      gtag('config', 'UA-129600615-1');
+    </script>
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-8447231665517865",
+        enable_page_level_ads: true
+      });
+    </script>
+
+    <meta charset="UTF-8">
+    <title>Arrow</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+  </head>
+  <body>
+    <div id="app">
+      <nav class="navbar">
+        <span class="text-roboto logo">Arrow</span>
+        <div class="container">
+          <button style="padding: 0 12px;" v-on:click="download">
+            <span class="text-roboto" style="font-weight: bold; font-size: 14px">скачать</span>
+          </button>
+          <button style="padding: 0 12px;margin-left: 5px;" v-on:click="instruction">
+            <span class="text-roboto" style="font-weight: bold; font-size: 14px">Инструкция</span>
+          </button>
+          <button v-if="currentWorkspace.UIToggle" style="padding: 0px 12px; margin-left: 5px" v-on:click="toggleUI">
+            <span class="text-roboto" style="font-weight: bold; font-size: 14px">Скрыть</span>
+          </button>
+          <button v-if="!currentWorkspace.UIToggle" style="padding: 0px 12px; margin-left: 5px" v-on:click="toggleUI">
+            <span class="text-roboto" style="font-weight: bold; font-size: 14px">Раскрыть</span>
+          </button>
+        </div>
+      </nav>
+      <div class="content">
+        <div class="editor-container">
+          <div id="editor">
+            using namespace std;
+          </div>
+        </div>
+        <div class="ui-container">
+          <div class="ui" v-if="currentWorkspace.UIToggle">
+            <div class="container"
+                 style="justify-content: space-evenly; align-items: center">
+              <label style="padding: 5px">
+            <span class="text-roboto"
+                  style="font-weight: bold; font-size: 16px">Язык: </span>
+                <select class="text-roboto"
+                        style="font-weight: bold; font-size: 16px"
+                        title="Язык"
+                        v-model="currentWorkspace.language"
+                        v-on:change="onLanguageChange">
+                  <option value="c++">C++17</option>
+                  <option value="java">Java8</option>
+                  <option value="python">python3</option>
+                </select>
+              </label>
+              <div class="container flex-column"
+                   style="justify-content: center; padding: 5px">
+                <button v-on:click="saveToLocalMemory">
+            <span class="text-roboto"
+                  style="font-weight: bold; font-size: 16px">Сохранить</span>
+                </button>
+                <span style="display: block; font-size: 12px;">Нажатие на клавишу F2 тоже сохраняет</span>
+              </div>
+            </div>
+          </div>
+          <span v-if="currentWorkspace.UIToggle"
+                class="text-roboto label ui">Ввод:</span>
+          <textarea v-if="currentWorkspace.UIToggle" title="Ввод:" class="io"
+                    v-model="currentWorkspace.input"></textarea>
+          <span v-if="currentWorkspace.UIToggle"
+                class="text-roboto label ui">Вывод:</span>
+          <textarea v-if="currentWorkspace.UIToggle" readonly title="Вывод:"
+                    class="io"
+                    v-model="currentWorkspace.output"></textarea>
+          <span v-if="currentWorkspace.UIToggle" class="text-roboto label ui">Ошибки:</span>
+          <textarea v-if="currentWorkspace.UIToggle" readonly title="Вывод:"
+                    class="io"
+                    v-model="currentWorkspace.errors"></textarea>
+          <div v-if="currentWorkspace.UIToggle" class="ui"
+               v-if="currentWorkspace.UIToggle">
+            <button style="width: 100%" v-on:click="run">
+              <span class="text-roboto" style="font-weight: bold; font-size: 24px">Запуск</span>
+            </button>
+          </div>
+          <div v-if="currentWorkspace.UIToggle" class="ui"
+               v-if="currentWorkspace.UIToggle">
+            <button style="" v-on:click="clearLocalStorage">
+            <span class="text-roboto"
+                  style="font-weight: bold; font-size: 12px">Очистить Сохранения</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <footer class="footer">
+        <div>
+          <p>
+            Copyright © 2018 Jankurazov Ruslan ruslanjan888@gmail.com <br>
+            under MIT License<br>
+          </p>
+        </div>
+      </footer>
+    </div>
+    <script src="/static/ace/src/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/ace/src/theme-dracula.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="/static/ace/src/mode-c_cpp.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="/static/ace/src/mode-java.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="/static/ace/src/mode-python.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="/static/ace/src/ext-language_tools.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="/static/ace/src/ext-elastic_tabstops_lite.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="/static/ace/src/ext-emmet.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="/static/js/vue/vue.js"></script>
+    <script src="/static/js/axios/axios.js"></script>
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          editor: null,
+          languages: {
+            'c++': ace.require('ace/mode/c_cpp').Mode,
+            'java': ace.require('ace/mode/java').Mode,
+            'python': ace.require('ace/mode/python').Mode,
+          },
+          options: {
+            enableLiveAutocompletion: true,
+            highlightActiveLine: true,
+            wrapBehavioursEnabled: true,
+            autoScrollEditorIntoView: false,
+            enableSnippets: true,
+            enableEmmet: true,
+            useElasticTabstops: true,
+            fontSize: 12,
+            scrollPastEnd: 1,
+            printMargin: 80,
+          },
+          sessionOptions: {
+            tabSize: 4,
+            wrap: 128,
+            useSoftTabs: true,
+          },
+          currentWorkspace: {
+            code: '',
+            language: 'c++',
+            UIToggle: true,
+            input: '',
+            output: '',
+            errors: '',
+          },
+        },
+        mounted: function () {
+          this.editor = ace.edit('editor');
+          this.loadFromLocalMemory();
+          //TODO editable configuration
+          this.editor.setTheme('ace/theme/dracula');
+          this.setOptions();
+          this.setSessionOptions();
+
+          this.editor.session.setMode(
+              new this.languages[this.currentWorkspace.language]());
+
+          window.addEventListener('keyup', (e) => {
+            if (e.key === 'F2') {
+              this.saveToLocalMemory();
+            }
+          });
+          setInterval(() => {
+            this.editor.resize();
+          }, 500);
+        },
+        methods: {
+          setSessionOptions: function () {
+            this.editor.session.setOptions(this.sessionOptions);
+          },
+
+          updateWorkspace: function () {
+            this.editor.setValue(this.currentWorkspace.code);
+            //this.setOptions();
+            //this.setSessionOptions();
+            this.editor.session.setMode(
+                new this.languages[this.currentWorkspace.language]());
+          },
+
+          loadFromLocalMemory: function () {
+            if (localStorage.data) {
+              try {
+                let data = JSON.parse(localStorage.data);
+                this.currentWorkspace = data.currentWorkspace;
+              } catch (e) {
+                console.log(e);
+              }
+            } else {
+
+            }
+            this.updateWorkspace();
+          },
+
+          setOptions: function () {
+            this.editor.setOptions(this.options);
+          },
+
+          saveToLocalMemory: function () {
+            this.currentWorkspace.code = this.editor.getValue();
+            localStorage.data = JSON.stringify({
+              currentWorkspace: this.currentWorkspace,
+            });
+          },
+
+          clearLocalStorage: function () {
+            localStorage.data = null;
+          },
+
+          onLanguageChange: function (event) {
+            this.editor.session.setMode(
+                new this.languages[this.currentWorkspace.language]());
+          },
+
+          toggleUI: function (event) {
+            this.currentWorkspace.UIToggle = !this.currentWorkspace.UIToggle;
+          },
+          instruction: function (event) {
+            alert(
+                "C++:\n" +
+                "Python3\n" +
+                "JAVA:\n" +
+                "класс должен иметь название Main\n");
+          },
+          download: function download() {
+            this.saveToLocalMemory();
+            let filename = 'file';
+            if (this.currentWorkspace.language === 'c++')
+              filename += '.cpp';
+            if (this.currentWorkspace.language === 'java')
+              filename += '.java';
+            if (this.currentWorkspace.language === 'python')
+              filename += '.py';
+            let text = this.currentWorkspace.code;
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+          },
+
+          run: function () {
+            this.saveToLocalMemory();
+            this.currentWorkspace.output = this.currentWorkspace.errors = 'Ожидание...';
+            axios.post('/run', {
+              code: this.currentWorkspace.code,
+              lang: this.currentWorkspace.language,
+              stdin: this.currentWorkspace.input,
+            }).then((response) => {
+              this.currentWorkspace.output = response.data.output +
+                  (response.data.time && response.data.time !== '' ?
+                      '\n Время исполнения ' + response.data.time + ' секунд.' :
+                      '');
+              this.currentWorkspace.errors = response.data.errors;
+              console.log(response);
+            }).catch((error) => {
+              console.log(error);
+            });
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

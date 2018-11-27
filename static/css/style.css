@@ -1,0 +1,158 @@
+@font-face {
+  font-family: "My Custom Font";
+  src: url(/font/Roboto-Black.ttf) format("truetype");
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+#app {
+  /*min-height: 100%;*/
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
+}
+
+#editor {
+  position: relative;
+  width: 100%;
+  min-height: 200px;
+  height: 100%;
+  flex: 1 1 auto;
+}
+
+.editor-container {
+  flex: 1 1 auto;
+}
+
+.content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+  align-content: stretch;
+  /*justify-content: space-evenly;*/
+}
+
+.text-roboto {
+  font-family: 'Roboto', sans-serif;
+}
+
+.settings {
+  display: flex;
+  padding: 10px;
+  flex-direction: row;
+  justify-content: space-between;
+  /*align-items: center;*/
+}
+
+.navbar {
+  flex: 0 1 auto;
+  display: flex;
+  justify-content: space-between;
+  height: 24px;
+  min-height: 24px;
+  max-height: 24px;
+  padding: 10px;
+  background: #666666;
+  color: #FFFFFF;
+}
+
+.io {
+  flex: 1 0 auto;
+  display: block;
+  height: 100px;
+  width: 200px;
+  margin: 8px 12px;
+  /*max-width: 100%;*/
+  /*min-width: 100%;*/
+  /*min-height: 100px;*/
+  /*box-sizing: border-box;         !* For IE and modern versions of Chrome *!*/
+  /*-moz-box-sizing: border-box;    !* For Firefox                          *!*/
+  /*-webkit-box-sizing: border-box; !* For Safari                           *!*/
+}
+
+span.label {
+  display: block;
+  font-weight: bold;
+  font-size: 16px
+}
+
+.ui-container {
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-content: flex-start;
+  justify-content: space-between;
+  overflow: scroll;
+}
+
+.ui {
+  flex: 1 0 auto;
+  padding: 4px 12px;
+}
+
+.footer {
+  font-size: 12px;
+  flex: 0 1 40px;
+  background-color: #444444;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 5px 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none !important;
+}
+
+.logo {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  /*cursor: pointer;
+  outline: none !important;*/
+}
+
+div.container {
+  display: flex; /* or inline-flex */
+}
+
+div.flex-row {
+  flex-direction: row;
+}
+
+div.flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
+div.flex-column {
+  flex-direction: column;
+}
+
+div.flex-column-reverse {
+  flex-direction: column-reverse;
+}
+
+div.flex-wrap {
+  flex-wrap: wrap;
+}
+
+div.flex-nowrap {
+  flex-wrap: nowrap;
+}
+
+div.flex-wrap-reverse {
+  flex-wrap: wrap-reverse;
+}
