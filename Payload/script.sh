@@ -21,10 +21,12 @@ ${compiler}
 
 if [[ $? == 0 ]]
 then
-    isolate -p --env=HOME=/root --dir=/usr/ --dir=/usercode/  --stdin=/usercode/inputFile  --cg -s --meta=/usercode/meta --chdir=/usercode  --run -- ${runner}
+    isolate --env=HOME=/root --dir=/usr/ --dir=/usercode/  --stdin=/usercode/inputFile  --cg -s --meta=/usercode/meta --chdir=/usercode  --run -- ${runner}
 else
-    echo "Compilation Failed"
+    echo "COMPILATION_ERROR"
 fi
+
+isolate --cleanup
 
 #exec 1>&3 2>&4
 
