@@ -2,7 +2,7 @@
 
 #This file is for docker
 
-cd /app/API
+cd /app
 
 
 

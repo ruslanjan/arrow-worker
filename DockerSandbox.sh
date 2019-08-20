@@ -1,4 +1,5 @@
 #!/bin/bash
+# Currently unused.
 
 set -e
 

@@ -4,6 +4,6 @@ cd /app/Setup
 
 docker build -t 'virtual_machine' - < Dockerfile
 
-cd /app/API
+cd /app
 
-npm install
+pip install -r requirements.txt

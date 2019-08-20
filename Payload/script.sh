@@ -3,7 +3,7 @@
 compiler=$1
 memory=$2
 time=$3
-walltime=$4
+wallTime=$4
 
 shift 4
 
@@ -21,7 +21,7 @@ ${compiler}
 
 if [[ $? == 0 ]]
 then
-    isolate --env=HOME=/root --dir=/usr/ --dir=/usercode/  --stdin=/usercode/inputFile  --cg -s --meta=/usercode/meta --chdir=/usercode  --run -- ${runner}
+    isolate --env=HOME=/root --dir=/usr/ --dir=/usercode/  --stdin=/usercode/inputFile --mem=${memory} --cg -s --meta=/usercode/meta --chdir=/usercode  --run -- ${runner}
 else
     echo "COMPILATION_ERROR"
 fi
