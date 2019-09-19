@@ -64,7 +64,7 @@
                         v-model="currentWorkspace.language"
                         v-on:change="onLanguageChange">
                   <option value="c++">C++17</option>
-                  <option value="java">Java8</option>
+<!--                  <option value="java">Java8</option>-->
                   <option value="python">python3</option>
                 </select>
               </label>
@@ -139,7 +139,7 @@
           editor: null,
           languages: {
             'c++': ace.require('ace/mode/c_cpp').Mode,
-            'java': ace.require('ace/mode/java').Mode,
+            // 'java': ace.require('ace/mode/java').Mode,
             'python': ace.require('ace/mode/python').Mode,
           },
           options: {
@@ -241,9 +241,7 @@
           instruction: function (event) {
             alert(
                 "C++:\n" +
-                "Python3\n" +
-                "JAVA:\n" +
-                "класс должен иметь название Main\n");
+                "Python3\n");
           },
           download: function download() {
             this.saveToLocalMemory();
@@ -275,11 +273,14 @@
               lang: this.currentWorkspace.language,
               stdin: this.currentWorkspace.input,
             }).then((response) => {
-              this.currentWorkspace.output = response.data.outputFile +
-                  (response.data.time && response.data.time !== '' ?
-                      '\n Время исполнения ' + response.data.time + ' секунд.' :
+                //if 'max-rss' in parsed_meta and 'time' in parsed_meta:
+                    //outputFile += f'''\n=====\nИспользовано: {parsed_meta["time"]} с, {parsed_meta["max-rss"]} КБ'''
+
+              this.currentWorkspace.output = response.data.output_file +
+                  (response.data.meta && response.data.meta['max-rss'] !== '' ?
+                      `\n=====\n Время исполнения: ${response.data.meta.time} с, ${response.data.meta['max-rss']} КБ` :
                       '');
-              this.currentWorkspace.errors = response.data.prepareLogs + '\n' + response.data.executionErrors;
+              this.currentWorkspace.errors = response.data.prepare_logs + '\n' + response.data.execution_errors;
               console.log(response);
             }).catch((error) => {
               console.log(error);

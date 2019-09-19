@@ -16,11 +16,6 @@ RUN apt install -y g++
 RUN apt install -y python
 RUN apt install -y python3
 
-# RUN apt install npm
-# RUN apt install nodejs
-
-# RUN npm install -g underscore request express jade shelljs passport http sys jquery lodash async mocha moment connect validator restify ejs ws co when helmet wrench brain mustache should backbone forever  debug && export NODE_PATH=/usr/local/lib/node_modules/
-
 #prepare for Java download
 # RUN apt install python-software-properties
 # RUN apt install software-properties-common
@@ -32,11 +27,6 @@ RUN apt install -y python3
 # RUN apt install openjdk8-jre
 RUN apt install -y openjdk-8-jdk
 ENV PATH="/usr/lib/jvm/java-1.8-openjdk/bin:${PATH}"
-
-
-# RUN apt install gobjc
-# RUN apt install gnustep-devel &&  sed -i 's/#define BASE_NATIVE_OBJC_EXCEPTIONS     1/#define BASE_NATIVE_OBJC_EXCEPTIONS     0/g' /usr/include/GNUstep/GNUstepBase/GSConfig.h
-
 
 RUN apt install -y curl
 

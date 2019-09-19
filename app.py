@@ -4,8 +4,8 @@ import secrets
 
 from flask import Flask, request
 
-from run_configs import run_configs
-from sandbox import Sandbox
+from defaultsandbox import DefaultSandbox
+from run_configs import default_run_configs
 
 app = Flask(__name__)
 
@@ -22,16 +22,29 @@ def run():
     vm_name = 'virtual_machine'
     path = os.path.dirname(os.path.realpath(__file__)) + '/'
 
-    container_wall_timelimit = 60
-    wall_timelimit = 10
+    container_wall_timelimit = 300
+    wall_timelimit = 15
 
     # these parameters might be used by judge
     timelimit = 2
-    memory_limit = 256 * 1000
+    memory_limit = 512 * 1000
 
-    sandbox = Sandbox(app, container_wall_timelimit, wall_timelimit, timelimit,
-                      memory_limit, path, folder, vm_name, data['code'],
-                      run_configs[data['lang']], data['stdin'])
+    files = {
+        default_run_configs[data['lang']][0]: data['code'],
+        'input_file': data['stdin']
+    }
+
+    sandbox = DefaultSandbox(app,
+                             container_wall_timelimit,
+                             wall_timelimit,
+                             timelimit,
+                             memory_limit,
+                             path,
+                             folder,
+                             vm_name,
+                             files,
+                             default_run_configs[data['lang']][1],
+                             'input_file')
     return json.dumps(sandbox.run)
 
 

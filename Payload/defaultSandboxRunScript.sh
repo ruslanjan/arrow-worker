@@ -4,8 +4,9 @@ prepare=$1
 memory=$2
 time=$3
 wallTime=$4
+input_file=$5
 
-shift 4
+shift 5
 
 runCommand=${@}
 
@@ -19,14 +20,14 @@ touch "/usercode/meta"
 
 cd /usercode || exit
 echo "$prepare" > ./prepare.sh
-bash /usercode/prepare.sh >>/usercode/prepareLogs 2>&1
+bash /usercode/prepare.sh >>/usercode/prepare_logs 2>&1
 
 if [[ $? == 0 ]]
 then
-    exec  1> $"/usercode/outputFile"
-    exec  2> $"/usercode/executionErrors"
+    exec  1> $"/usercode/output_file"
+    exec  2> $"/usercode/execution_Errors"
     # shellcheck disable=SC2086
-    isolate --env=HOME=/root --time=${time} --wall-time=${wallTime} --dir=/usr/ --dir=/usercode/  --stdin=/usercode/inputFile --mem=${memory} --cg -s --meta=/usercode/meta --chdir=/usercode  --run -- ${runCommand}
+    isolate --env=HOME=/root --time=${time} --wall-time=${wallTime} --dir=/usr/ --dir=/usercode/  --stdin=/usercode/${input_file} --mem=${memory} --cg -s --meta=/usercode/meta --chdir=/usercode  --run -- ${runCommand}
 else
     echo "COMPILATION_ERROR"
 fi

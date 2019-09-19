@@ -4,7 +4,22 @@ import subprocess
 from flask import Flask
 
 
-class Sandbox:
+class DefaultRunConfig:
+    def __init__(self, prepare_script, runner_command, description=''):
+        """
+        :param prepare_script: bash script executed before runner command
+        :param runner_command: command to run executable in sandbox
+        :param file: all files that will be added to /usercode/.
+        is an array looks like this "{"main.cpp": "#include", "inputFile": '1 2 2 3'}"
+        files should be without '/' and files in folders should be ''
+        :param description: description of config
+        """
+        self.prepare_script = prepare_script
+        self.runner_command = runner_command
+        self.description = description
+
+
+class DefaultSandbox:
     """
     app: flask app
     container_wall_timelimit: time limit for container
@@ -17,13 +32,16 @@ class Sandbox:
     code: user code
     run_config: configuration to run
     stdin_data: input data
+    in_container: if true uses docker container. NOT YET IMPLEMENTED
+    container_memory_limit: container memory limit in mega bytes
     """
 
     def __init__(self, app: Flask, container_wall_timelimit,
                  wall_timelimit: int, timelimit: int, memory_limit: int,
                  app_path: str, folder: str,
-                 vm_name: str, code: str,
-                 run_config: dict, stdin_data: str):
+                 vm_name: str, files: dict,
+                 run_config: DefaultRunConfig, stdin_file: str,
+                 container_memory_limit=2048, in_container=True):
         self.app = app
         self.container_wall_timelimit = container_wall_timelimit
         self.wall_timelimit = wall_timelimit
@@ -33,20 +51,35 @@ class Sandbox:
         # folder were code is contained. look like: self.app_path + self.folder
         self.folder = folder
         self.vm_name = vm_name
-        self.code = code
+        self.files = files
         self.run_config = run_config
-        self.stdin_data = stdin_data
+        self.stdin_file = stdin_file
         self.app.logger.info('Sandbox created')
+        self.in_container = in_container
+        self.container_memory_limit = container_memory_limit
 
     @property
     def run(self) -> dict:
-        return self.prepare()
+        res = self.prepare()
+        # rm folder to be sure.
+        subprocess.run(f'rm -r {self.app_path}{self.folder}', shell=True)
+        return res
+
+    def create_and_write_to_file(self, path, data):
+        try:
+            path = open(path, 'w')
+            path.write(data)
+            path.close()
+        except IOError:
+            self.app.logger.error(
+                f'FAILED TO WRITE/OPEN FILE: {path}')
+            return self.internal_error()
 
     def prepare(self):
         """
         copying payload, usercode and input to temp directory
         """
-        # Copy payload
+        # Copy payload folder at /app/Payload
         cp = subprocess.run(
             f'mkdir {self.app_path}{self.folder} && cp {self.app_path}/Payload/* {self.app_path}{self.folder} && chmod 777 {self.app_path}{self.folder}',
             shell=True)
@@ -56,44 +89,26 @@ class Sandbox:
             return self.internal_error()
 
         # Writing code and input
-        code_file_path = f'{self.app_path}{self.folder}/{self.run_config["file"]}'
-        input_file_path = f'{self.app_path}{self.folder}/inputFile'
-        try:
-            code_file = open(code_file_path, 'w')
-            code_file.write(self.code)
-            code_file.close()
-        except IOError:
-            self.app.logger.error(
-                f'FAILED TO WRITE/OPEN FILE: {code_file_path}')
-            return self.internal_error()
-        try:
-            input_file = open(input_file_path, 'w')
-            input_file.write(self.stdin_data)
-            input_file.close()
-        except IOError:
-            self.app.logger.error(
-                f'FAILED TO WRITE/OPEN FILE: {input_file_path}')
-            return self.internal_error()
+        # code_file_path = f'{self.app_path}{self.folder}/{self.run_config.file}'
+        for path, data in self.files.items():
+            self.create_and_write_to_file(
+                f'{self.app_path}{self.folder}/{path}', data)
+
+        # input_file_path = f'{self.app_path}{self.folder}/input_file'
+        # self.create_and_write_to_file(input_file_path, self.stdin_data)
 
         return self.execute()
 
     def internal_error(self):
         subprocess.run(f'rm -r {self.app_path}{self.folder}', shell=True)
         return {
-            'output': '',
+            'message': 'IE',
             'errors': 'Internal error, see logs',
         }
 
-    def execute(self):
-        """
-        executing usercode with given input.
-        steps:
-        create docker container with parameters "--cap-add=ALL --privileged --rm -d -m 512M -i -t"
-        """
-
-        # env TEMP_DIR is for local run purpose only
-        st = f'docker run --cap-add=ALL --privileged --rm -d -m 512M -i -t -v  "{(os.getenv("TEMP_DIR") + "/" if os.getenv("TEMP_DIR") else self.app_path)}{self.folder}":/usercode ' + \
-             f'{self.vm_name} /usercode/script.sh "{self.run_config["compilerScript"]}" {str(self.memory_limit)} {str(self.timelimit)} {self.wall_timelimit} {self.run_config["runnerScript"]}'
+    def run_container(self, run_command):
+        st = f'docker run --cap-add=ALL --privileged --rm -d -m {self.container_memory_limit}M -i -t -v  "{(os.getenv("TEMP_DIR") + "/" if os.getenv("TEMP_DIR") else self.app_path)}{self.folder}":/usercode ' + \
+             f'{self.vm_name} /usercode/' + run_command
         self.app.logger.info('Docker start command: ' + st)
         container_id = subprocess.run(st, shell=True,
                                       stdout=subprocess.PIPE).stdout.decode(
@@ -114,7 +129,7 @@ class Sandbox:
         except subprocess.TimeoutExpired:
             subprocess.run(f'rm -r {self.app_path}{self.folder}', shell=True)
             return {
-                'output': '',
+                'message': 'CTL',  # container time limit
                 'errors': 'Wall time exceeded\nInternal error, see logs',
             }
         except subprocess.CalledProcessError:
@@ -125,7 +140,20 @@ class Sandbox:
                            shell=True)
             subprocess.run(f'rm -r {self.app_path}{self.folder}', shell=True)
             return self.internal_error()
-        print('container exited successfully')
+        self.app.logger.info('container exited successfully')
+
+    def execute(self):
+        """
+        executing usercode with given input.
+        steps:
+        create docker container with parameters "--cap-add=ALL --privileged --rm -d -m 512M -i -t"
+        """
+
+        run_command = f'defaultSandboxRunScript.sh "{self.run_config.prepare_script}" {str(self.memory_limit)} {str(self.timelimit)} {self.wall_timelimit} {self.stdin_file} {self.run_config.runner_command} '
+        if self.in_container or True:
+            self.run_container(run_command)
+        else:
+            pass  # not yet implemented
         meta = str()
         try:
             fs = open(f'{self.app_path}{self.folder}/meta')
@@ -135,35 +163,37 @@ class Sandbox:
                 'FAILED TO WRITE/OPEN FILE: meta. some how sandbox failed')
             return self.internal_error()
         parsed_meta = dict()
-        print(meta)
+        self.app.logger.info(meta)
         for i in meta.split('\n'):
             if i != '':
                 parsed_meta[i[0:i.find(':')]] = i[i.find(':') + 1:]
-        prepareLogs = ''
-        outputFile = ''
-        executionErrors = ''
+        prepare_logs = ''
+        output_file = ''
+        execution_errors = ''
         try:
-            fs = open(f'{self.app_path}{self.folder}/prepareLogs')
-            prepareLogs = fs.read()
+            fs = open(f'{self.app_path}{self.folder}/prepare_logs')
+            prepare_logs = fs.read()
         except IOError:
-            self.app.logger.error('FAILED TO WRITE/OPEN FILE: /prepareLogs')
+            self.app.logger.error('FAILED TO WRITE/OPEN FILE: /prepare_logs')
         try:
-            fs = open(f'{self.app_path}{self.folder}/outputFile')
-            outputFile = fs.read()
+            fs = open(f'{self.app_path}{self.folder}/output_file')
+            output_file = fs.read()
         except IOError:
-            self.app.logger.error('FAILED TO WRITE/OPEN FILE: /outputFile')
-        if 'max-rss' in parsed_meta and 'time' in parsed_meta:
-            outputFile += f'''\n=====\nИспользовано: {parsed_meta["time"]} с, {parsed_meta["max-rss"]} КБ'''
+            self.app.logger.error('FAILED TO WRITE/OPEN FILE: /output_file')
+        # if 'max-rss' in parsed_meta and 'time' in parsed_meta:
+        #     output_file += f'''\n=====\nИспользовано: {parsed_meta["time"]} с, {parsed_meta["max-rss"]} КБ'''
         try:
-            fs = open(f'{self.app_path}{self.folder}/executionErrors')
+            fs = open(f'{self.app_path}{self.folder}/execution_errors')
             errors = fs.read()
         except IOError:
-            self.app.logger.error('FAILED TO WRITE/OPEN FILE: /executionErrors')
+            self.app.logger.error(
+                'FAILED TO WRITE/OPEN FILE: /execution_errors')
         data = {
-            'prepareLogs': prepareLogs,
-            'outputFile': outputFile,
-            'executionErrors': executionErrors,
+            'prepare_logs': prepare_logs,
+            'output_file': output_file,
+            'execution_errors': execution_errors,
             'meta': parsed_meta,
+            'compilation_result': meta != ''
         }
         subprocess.run(f'rm -r {self.app_path}{self.folder}', shell=True)
         return data
