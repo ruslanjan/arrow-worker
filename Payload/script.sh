@@ -1,27 +1,32 @@
 #!/bin/bash
 
-compiler=$1
+prepare=$1
 memory=$2
 time=$3
 wallTime=$4
 
 shift 4
 
-runner=${@}
+runCommand=${@}
 
 isolate-check-environment -e
 isolate --cg --dir=/usercode/ --init
 
-echo "" > /usercode/meta
+touch "/usercode/meta"
+#touch "/usercode/outputFile"
+#chmod 777 "/usercode/outputFile"
+#ls -la > /usercode/completed
 
-exec  1> $"/usercode/logfile"
-exec  2> $"/usercode/errors"
-
-${compiler}
+cd /usercode || exit
+echo "$prepare" > ./prepare.sh
+bash /usercode/prepare.sh >>/usercode/prepareLogs 2>&1
 
 if [[ $? == 0 ]]
 then
-    isolate --env=HOME=/root --dir=/usr/ --dir=/usercode/  --stdin=/usercode/inputFile --mem=${memory} --cg -s --meta=/usercode/meta --chdir=/usercode  --run -- ${runner}
+    exec  1> $"/usercode/outputFile"
+    exec  2> $"/usercode/executionErrors"
+    # shellcheck disable=SC2086
+    isolate --env=HOME=/root --time=${time} --wall-time=${wallTime} --dir=/usr/ --dir=/usercode/  --stdin=/usercode/inputFile --mem=${memory} --cg -s --meta=/usercode/meta --chdir=/usercode  --run -- ${runCommand}
 else
     echo "COMPILATION_ERROR"
 fi
@@ -32,6 +37,4 @@ isolate --cleanup
 
 #head -100 /usercode/logfile.txt
 #touch /usercode/completed
-
-mv /usercode/logfile /usercode/completed
 

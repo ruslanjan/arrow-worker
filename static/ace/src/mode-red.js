@@ -43,7 +43,7 @@ var RedHighlightRules = function() {
                 "(?:datatype|unset|none|logic|block|paren|string|" +
                 "file|url|char|integer|float|word|set-word|lit-word|" +
                 "get-word|refinement|issue|native|action|op|function|" +
-                "path|lit-path|set-path|get-path|routine|bitset|point|" + 
+                "path|lit-path|set-path|get-path|routine|bitset|point|" +
                 "object|typeset|error|vector|hash|pair|percent|tuple|" +
                 "map|binary|time|tag|email|handle|date|image|event|" +
                 "series|any-type|number|any-object|scalar|" +

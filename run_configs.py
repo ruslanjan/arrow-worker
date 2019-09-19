@@ -1,4 +1,4 @@
-languages = {
+run_configs = {
     'python': {
         'compilerScript': '/usercode/python3Compiler.sh',
         'runnerScript': '/usr/bin/python3 /usercode/file.py',

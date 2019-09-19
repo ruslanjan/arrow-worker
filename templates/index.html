@@ -275,11 +275,11 @@
               lang: this.currentWorkspace.language,
               stdin: this.currentWorkspace.input,
             }).then((response) => {
-              this.currentWorkspace.output = response.data.output +
+              this.currentWorkspace.output = response.data.outputFile +
                   (response.data.time && response.data.time !== '' ?
                       '\n Время исполнения ' + response.data.time + ' секунд.' :
                       '');
-              this.currentWorkspace.errors = response.data.errors;
+              this.currentWorkspace.errors = response.data.prepareLogs + '\n' + response.data.executionErrors;
               console.log(response);
             }).catch((error) => {
               console.log(error);

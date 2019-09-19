@@ -4,7 +4,7 @@ import secrets
 
 from flask import Flask, request
 
-from languages import languages
+from run_configs import run_configs
 from sandbox import Sandbox
 
 app = Flask(__name__)
@@ -31,8 +31,13 @@ def run():
 
     sandbox = Sandbox(app, container_wall_timelimit, wall_timelimit, timelimit,
                       memory_limit, path, folder, vm_name, data['code'],
-                      languages[data['lang']], data['stdin'])
+                      run_configs[data['lang']], data['stdin'])
     return json.dumps(sandbox.run)
+
+
+@app.route('/custom_run', methods=["POST"])
+def custom_run():
+    pass
 
 
 # def submit():
