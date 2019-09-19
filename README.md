@@ -10,6 +10,8 @@ make simple bash script to run project. sorry.
 ### requirements
 * `docker`
 * `python3.7`
+### setup
+build docker image from `/Setup/Dockerfile` with name `virtual_machine`
 ### running
 Just run app.py, make sure you installed 
 `requirements.txt`. Now visit http://127.0.0.1:5000/
