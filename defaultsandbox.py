@@ -90,23 +90,31 @@ class DefaultSandbox:
 
         # Writing code and input
         # code_file_path = f'{self.app_path}{self.folder}/{self.run_config.file}'
+        # self.create_and_write_to_file(code_file_path, self.code)
+        # input_file_path = f'{self.app_path}{self.folder}/input_file'
+        # self.create_and_write_to_file(input_file_path, self.stdin_data)
+
+        # create all request files
         for path, data in self.files.items():
             self.create_and_write_to_file(
                 f'{self.app_path}{self.folder}/{path}', data)
 
-        # input_file_path = f'{self.app_path}{self.folder}/input_file'
-        # self.create_and_write_to_file(input_file_path, self.stdin_data)
 
         return self.execute()
 
-    def internal_error(self):
+    def internal_error(self, message):
         subprocess.run(f'rm -r {self.app_path}{self.folder}', shell=True)
         return {
-            'message': 'IE',
-            'errors': 'Internal error, see logs',
+            'IE': True,
+            'errors': message,
         }
 
     def run_container(self, run_command):
+        """
+        runs container and exec run_command inside.
+        :param run_command:
+        :return:
+        """
         st = f'docker run --cap-add=ALL --privileged --rm -d -m {self.container_memory_limit}M -i -t -v  "{(os.getenv("TEMP_DIR") + "/" if os.getenv("TEMP_DIR") else self.app_path)}{self.folder}":/usercode ' + \
              f'{self.vm_name} /usercode/' + run_command
         self.app.logger.info('Docker start command: ' + st)
@@ -127,11 +135,7 @@ class DefaultSandbox:
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                            shell=True)
         except subprocess.TimeoutExpired:
-            subprocess.run(f'rm -r {self.app_path}{self.folder}', shell=True)
-            return {
-                'message': 'CTL',  # container time limit
-                'errors': 'Wall time exceeded\nInternal error, see logs',
-            }
+            return self.internal_error('Wall time exceeded\nInternal error, see logs')
         except subprocess.CalledProcessError:
             pass
         except Exception:
@@ -139,14 +143,19 @@ class DefaultSandbox:
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                            shell=True)
             subprocess.run(f'rm -r {self.app_path}{self.folder}', shell=True)
-            return self.internal_error()
+            return self.internal_error('Internal error, see logs')
         self.app.logger.info('container exited successfully')
 
     def execute(self):
         """
         executing usercode with given input.
         steps:
-        create docker container with parameters "--cap-add=ALL --privileged --rm -d -m 512M -i -t"
+        create docker container with parameters "--cap-add=ALL --privileged --rm -d -m {container_memory_limit}M -i -t"
+        add volume to docker container with usercode to /usercode/ ""{self.app_path}{self.folder}":/usercode"
+        run docker with script defaultSandboxRunScript and configuration to run.
+        parse meta
+        parse output
+        :return result of run as dict
         """
 
         run_command = f'defaultSandboxRunScript.sh "{self.run_config.prepare_script}" {str(self.memory_limit)} {str(self.timelimit)} {self.wall_timelimit} {self.stdin_file} {self.run_config.runner_command} '
@@ -193,7 +202,7 @@ class DefaultSandbox:
             'output_file': output_file,
             'execution_errors': execution_errors,
             'meta': parsed_meta,
-            'compilation_result': meta != ''
+            'IE': False
         }
         subprocess.run(f'rm -r {self.app_path}{self.folder}', shell=True)
         return data
