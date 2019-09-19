@@ -16,7 +16,7 @@ Just run app.py, make sure you installed
 profit ????
 
 ## Appendix
-NurlashKO: But hey ruslanjan there is no documentation!?
+~~NurlashKO~~: But hey ruslanjan there is no documentation!?
 
-ruslanjan: haha! Actually source files contains some 
+~~ruslanjan~~: haha! Actually source files contains some 
 comment documentation!  
