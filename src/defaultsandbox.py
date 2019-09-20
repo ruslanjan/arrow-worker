@@ -4,7 +4,7 @@ import subprocess
 from flask import Flask
 
 
-class DefaultRunConfig:
+class DefaultSandboxRunConfig:
     def __init__(self, prepare_script, runner_command, description=''):
         """
         :param prepare_script: bash script executed before runner command
@@ -42,7 +42,7 @@ class DefaultSandbox:
                  wall_timelimit: int, timelimit: int, memory_limit: int,
                  app_path: str, folder: str,
                  vm_name: str, files: dict,
-                 run_config: DefaultRunConfig,
+                 run_config: DefaultSandboxRunConfig,
                  container_memory_limit=2048, in_container=True):
         self.app = app
         self.container_wall_timelimit = container_wall_timelimit

@@ -1,7 +1,7 @@
-from defaultsandbox import DefaultRunConfig
+from defaultsandbox import DefaultSandboxRunConfig
 
 default_run_configs = {
-    'python': ['file.py', DefaultRunConfig(
+    'python': ['file.py', DefaultSandboxRunConfig(
         prepare_script='''
                         #!/bin/bash
                         ''',
@@ -10,7 +10,7 @@ default_run_configs = {
         description='Python3')],
     'c++': [
         'file.cpp',
-        DefaultRunConfig(
+        DefaultSandboxRunConfig(
             prepare_script='''
                 #!/bin/bash
                 g++ -std=c++17 -static -o a.out file.cpp
