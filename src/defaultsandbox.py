@@ -21,6 +21,9 @@ class DefaultRunConfig:
 
 class DefaultSandbox:
     """
+    runner_command stdin file is "input_file", stdout "output_file" and
+    stderr "execution_errors".
+
     app: flask app
     container_wall_timelimit: time limit for container
     wall_timelimit: real time timelimit for code
@@ -31,7 +34,6 @@ class DefaultSandbox:
     vm_name: sandbox vm name
     code: user code
     run_config: configuration to run
-    stdin_data: input data
     in_container: if true uses docker container. NOT YET IMPLEMENTED
     container_memory_limit: container memory limit in mega bytes
     """
@@ -40,7 +42,7 @@ class DefaultSandbox:
                  wall_timelimit: int, timelimit: int, memory_limit: int,
                  app_path: str, folder: str,
                  vm_name: str, files: dict,
-                 run_config: DefaultRunConfig, stdin_file: str,
+                 run_config: DefaultRunConfig,
                  container_memory_limit=2048, in_container=True):
         self.app = app
         self.container_wall_timelimit = container_wall_timelimit
@@ -53,7 +55,6 @@ class DefaultSandbox:
         self.vm_name = vm_name
         self.files = files
         self.run_config = run_config
-        self.stdin_file = stdin_file
         self.app.logger.info('Sandbox created')
         self.in_container = in_container
         self.container_memory_limit = container_memory_limit
@@ -98,7 +99,9 @@ class DefaultSandbox:
         for path, data in self.files.items():
             self.create_and_write_to_file(
                 f'{self.app_path}{self.folder}/{path}', data)
-
+        if 'input_file' not in self.files:
+            self.create_and_write_to_file(
+                f'{self.app_path}{self.folder}/input_file', 'data')
 
         return self.execute()
 
@@ -150,15 +153,26 @@ class DefaultSandbox:
         """
         executing usercode with given input.
         steps:
-        create docker container with parameters "--cap-add=ALL --privileged --rm -d -m {container_memory_limit}M -i -t"
-        add volume to docker container with usercode to /usercode/ ""{self.app_path}{self.folder}":/usercode"
-        run docker with script defaultSandboxRunScript and configuration to run.
-        parse meta
-        parse output
-        :return result of run as dict
+        1. create docker container with parameters "--cap-add=ALL --privileged --rm -d -m {container_memory_limit}M -i -t"
+        1.2. add volume to docker container with usercode to /usercode/ ""{self.app_path}{self.folder}":/usercode"
+        2. run docker with script defaultSandboxRunScript and configuration to run using "isolate".
+        4. parse isolate meta
+        5. parse output
+
+        if return contains "IE" key then docker broke not a usercode fault
+        check meta for MLE, TLE, RE, etc...
+        :return result of run as dict:
+                {
+                'prepare_logs': log of prepare_script from stdout
+                'prepare_errors': log of prepare_script from stderr
+                'output_file':  output of runner_command from stdout
+                'execution_errors':  output of runner_command from stderr
+                'meta': log of isolate if prepare_script returned 0
+                'IE': if true none of above are valid. caught internal error
+                }
         """
 
-        run_command = f'defaultSandboxRunScript.sh "{self.run_config.prepare_script}" {str(self.memory_limit)} {str(self.timelimit)} {self.wall_timelimit} {self.stdin_file} {self.run_config.runner_command} '
+        run_command = f'defaultSandboxRunScript.sh "{self.run_config.prepare_script}" {str(self.memory_limit)} {str(self.timelimit)} {self.wall_timelimit} {self.run_config.runner_command} '
         if self.in_container or True:
             self.run_container(run_command)
         else:

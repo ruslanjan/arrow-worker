@@ -8,14 +8,17 @@ default_run_configs = {
         runner_command='/usr/bin/python3 /usercode/file.py',
         # file='file.py',
         description='Python3')],
-    'c++': ['file.cpp', DefaultRunConfig(
-        prepare_script='''
+    'c++': [
+        'file.cpp',
+        DefaultRunConfig(
+            prepare_script='''
                 #!/bin/bash
                 g++ -std=c++17 -static -o a.out file.cpp
                 ''',
-        runner_command='/usercode/a.out',
-        # file='file.cpp',
-        description='C++17')],
+            runner_command='/usercode/a.out',
+            # file='file.cpp',
+            description='C++17')
+    ],
     # java still don't work
     # 'java': ['Main.java', DefaultRunConfig(
     #     prepare_script='''
