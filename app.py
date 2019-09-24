@@ -4,8 +4,8 @@ import secrets
 
 from flask import Flask, request
 
-from defaultsandbox import DefaultSandbox
-from run_configs import default_run_configs
+from arrow.defaultsandbox import DefaultSandbox
+from arrow.run_configs import default_run_configs
 
 app = Flask(__name__)
 
@@ -32,7 +32,7 @@ def run():
 
     files = {
         default_run_configs[data['lang']][0]: data['code'],
-        'input_file': data['stdin']
+        'usercode/input_file': data['stdin']
     }
 
     sandbox = DefaultSandbox(app,
