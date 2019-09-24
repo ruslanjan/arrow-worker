@@ -4,8 +4,8 @@ import secrets
 
 from flask import Flask, request
 
-from defaultsandbox import DefaultSandbox, DefaultSandboxRunConfig
-from run_configs import default_run_configs
+from arrow.defaultsandbox import DefaultSandbox
+from arrow.run_configs import default_run_configs
 
 app = Flask(__name__)
 
@@ -32,7 +32,7 @@ def run():
 
     files = {
         default_run_configs[data['lang']][0]: data['code'],
-        'input_file': data['stdin']
+        'usercode/input_file': data['stdin']
     }
 
     sandbox = DefaultSandbox(app,
@@ -54,22 +54,19 @@ def custom_run():
     data = json.loads(request.data)
     folder = 'temp/' + secrets.token_hex(16)
     vm_name = 'virtual_machine'
-    path = os.path.dirname(os.path.realpath(__file__)) + '/'
     container_wall_timelimit = 300
     wall_timelimit = 20
-
-    config = DefaultSandboxRunConfig(**data['files'])
 
     sandbox = DefaultSandbox(app,
                              container_wall_timelimit,
                              wall_timelimit,
-                             data['timelimit'],
-                             data['memory_limit'],
+                             timelimit,
+                             memory_limit,
                              path,
                              folder,
                              vm_name,
-                             data['files'],
-                             config,
+                             files,
+                             default_run_configs[data['lang']][1],
                              'input_file')
 
     return json.dumps(sandbox.run)

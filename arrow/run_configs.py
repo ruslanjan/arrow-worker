@@ -1,21 +1,21 @@
-from defaultsandbox import DefaultSandboxRunConfig
+from arrow.defaultsandbox import DefaultRunConfig
 
 default_run_configs = {
-    'python': ['file.py', DefaultSandboxRunConfig(
+    'python': ['usercode/file.py', DefaultRunConfig(
         prepare_script='''
                         #!/bin/bash
                         ''',
-        runner_command='/usr/bin/python3 /usercode/file.py',
+        runner_command='/usr/bin/python3 file.py',
         # file='file.py',
         description='Python3')],
     'c++': [
         'file.cpp',
-        DefaultSandboxRunConfig(
+        DefaultRunConfig(
             prepare_script='''
                 #!/bin/bash
-                g++ -std=c++17 -static -o a.out file.cpp
+                g++ -std=c++17 -static -o usercode/a.out file.cpp
                 ''',
-            runner_command='/usercode/a.out',
+            runner_command='./a.out',
             # file='file.cpp',
             description='C++17')
     ],
