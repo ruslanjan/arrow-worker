@@ -280,7 +280,7 @@
                   (response.data.meta && response.data.meta['max-rss'] !== '' ?
                       `\n=====\n Время исполнения: ${response.data.meta.time} с, ${response.data.meta['max-rss']} КБ` :
                       '');
-              this.currentWorkspace.errors = response.data.prepare_logs + '\n' + response.data.execution_errors;
+              this.currentWorkspace.errors = response.data.prepare_logs + '\n' + response.data.error_file;
               console.log(response);
             }).catch((error) => {
               console.log(error);

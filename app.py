@@ -2,9 +2,9 @@ import json
 import os
 import secrets
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
-from arrow.defaultsandbox import DefaultSandbox
+from arrow.sandbox import DefaultSandbox
 from arrow.run_configs import default_run_configs
 
 app = Flask(__name__)
@@ -19,9 +19,7 @@ def hello_world():
 @app.route('/run', methods=["POST"])
 def run():
     data = json.loads(request.data)
-    folder = 'temp/' + secrets.token_hex(16)
-    vm_name = 'virtual_machine'
-    path = os.path.dirname(os.path.realpath(__file__)) + '/'
+    app_path = os.path.dirname(os.path.realpath(__file__)) + '/'
 
     container_wall_timelimit = 300
     wall_timelimit = 20
@@ -32,44 +30,44 @@ def run():
 
     files = {
         default_run_configs[data['lang']][0]: data['code'],
-        'usercode/input_file': data['stdin']
+        'usercode/input_file': data['stdin'],
+        'prepare.sh': default_run_configs[data['lang']][1],
+        'post.sh': default_run_configs[data['lang']][3]
     }
 
-    sandbox = DefaultSandbox(app,
-                             container_wall_timelimit,
-                             wall_timelimit,
-                             timelimit,
-                             memory_limit,
-                             path,
-                             folder,
-                             vm_name,
-                             files,
-                             default_run_configs[data['lang']][1],
-                             'input_file')
-    return json.dumps(sandbox.run)
+    sandbox = DefaultSandbox(app=app,
+                             container_wall_timelimit=container_wall_timelimit,
+                             wall_timelimit=wall_timelimit,
+                             timelimit=timelimit,
+                             memory_limit=memory_limit,
+                             app_path=app_path,
+                             files=files,
+                             runner_command=default_run_configs[data['lang']][2])
+    return jsonify(sandbox.run)
 
 
 @app.route('/custom_run', methods=["POST"])
 def custom_run():
     data = json.loads(request.data)
-    folder = 'temp/' + secrets.token_hex(16)
-    vm_name = 'virtual_machine'
+    app_path = os.path.dirname(os.path.realpath(__file__)) + '/'
+
     container_wall_timelimit = 300
-    wall_timelimit = 20
+    files = {
+        default_run_configs[data['lang']][0]: data['code'],
+        'usercode/input_file': data['stdin'],
+        'prepare.sh': default_run_configs[data['lang']][1],
+        'post.sh': default_run_configs[data['lang']][3]
+    }
 
-    sandbox = DefaultSandbox(app,
-                             container_wall_timelimit,
-                             wall_timelimit,
-                             timelimit,
-                             memory_limit,
-                             path,
-                             folder,
-                             vm_name,
-                             files,
-                             default_run_configs[data['lang']][1],
-                             'input_file')
-
-    return json.dumps(sandbox.run)
+    sandbox = DefaultSandbox(app=app,
+                             container_wall_timelimit=container_wall_timelimit,
+                             wall_timelimit=data['wall_timelimit'],
+                             timelimit=data['time_limit'],
+                             memory_limit=data['memory_limit'],
+                             app_path=app_path,
+                             files=data['files'],
+                             runner_command=data['runner_command'])
+    return jsonify(sandbox.run)
 
 
 # def submit():
