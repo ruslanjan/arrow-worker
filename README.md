@@ -9,12 +9,10 @@ because its still in dev by me,  i did't bothered to
 make simple bash script to run project. sorry. 
 ### requirements
 * `docker`
-* `python3.7`
 ### setup
-build docker image from `/Setup/Dockerfile` with name `virtual_machine`
+run `docker build . -t arrow`
 ### running
-Just run app.py, make sure you installed 
-`requirements.txt`. Now visit http://127.0.0.1:5000/
+run `bash run-container.sh` Now visit http://127.0.0.1:5000/
 profit ????
 
 ## Appendix

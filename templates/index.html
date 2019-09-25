@@ -276,11 +276,11 @@
                 //if 'max-rss' in parsed_meta and 'time' in parsed_meta:
                     //outputFile += f'''\n=====\nИспользовано: {parsed_meta["time"]} с, {parsed_meta["max-rss"]} КБ'''
 
-              this.currentWorkspace.output = response.data.output_file +
+              this.currentWorkspace.output = response.data.payload.output +
                   (response.data.meta && response.data.meta['max-rss'] !== '' ?
                       `\n=====\n Время исполнения: ${response.data.meta.time} с, ${response.data.meta['max-rss']} КБ` :
                       '');
-              this.currentWorkspace.errors = response.data.prepare_logs + '\n' + response.data.error_file;
+              this.currentWorkspace.errors = response.data.prepare_errors + '\n' + response.data.payload.error_file;
               console.log(response);
             }).catch((error) => {
               console.log(error);
