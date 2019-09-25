@@ -1,11 +1,10 @@
 import json
 import os
-import secrets
 
 from flask import Flask, request, jsonify
 
-from arrow.sandbox import DefaultSandbox
 from arrow.run_configs import default_run_configs
+from arrow.sandbox import DefaultSandbox
 
 app = Flask(__name__)
 
@@ -65,4 +64,7 @@ def custom_run():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(threaded=False)
+    # "threaded=False" very important. because if we
+    # have parallel
+    # request than this will crash isolate
