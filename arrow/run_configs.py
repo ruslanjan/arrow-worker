@@ -16,7 +16,7 @@ default_run_configs = {
         # prepare script. saved to prepare.sh
         '''
         #!/bin/bash 
-        g++ -std=c++17 -static -o usercode/a.out file.cpp
+        g++ -std=c++17 -static -o usercode/a.out file.cpp 2> prepare_errors
         ''',
         # run command
         './a.out',
