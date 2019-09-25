@@ -34,6 +34,6 @@ default_run_configs = {
 #                     #!/bin/bash
 #                     javac Main.java
 #                     ''',
-#     runner_command='/usr/lib/jvm/java-8-openjdk-amd64/bin/java -Xmx512M -Xss64M Main',
+#     run_command='/usr/lib/jvm/java-8-openjdk-amd64/bin/java -Xmx512M -Xss64M Main',
 #     # file='Main.java',
 #     description='Java')],

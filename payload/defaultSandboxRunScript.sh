@@ -14,11 +14,11 @@ cd $path || exit
 touch "$path/meta"
 touch "$path/patload_files"
 
-exec  1> $"$path/logs"
-exec  2> $"$path/logs"
-
 isolate-check-environment -e
 isolate --cg --init
+
+exec  1> $"$path/logs"
+exec  2> $"$path/logs"
 
 /bin/su -c "/bin/bash prepare.sh" dummy #1>$path/prepare_logs 2>$path/prepare_errors
 

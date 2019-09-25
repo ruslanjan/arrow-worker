@@ -14,10 +14,10 @@ class DefaultSandbox:
     path and value is content, if it is in folder than folder will be
     created. All files are placed relative to temp dir and should not begin
     with "/". if you want some file be accessed during execution of
-    runner_command than put them inside usercode/folder like
+    run_command than put them inside usercode/folder like
     "usercode/file.py".
 
-    runner_command is what supplied to isolate to run in
+    run_command is what supplied to isolate to run in
     safe boundaries like "/bin/python3 files.py", isolate run this command
     inside usercode folder in sandbox, "/bin/python3 usercode/files.py" is
     not correct.
@@ -54,10 +54,10 @@ class DefaultSandbox:
     @:param timelimit usercode time limit
     @:param app_path path to app where payload folder contains. for difference payload versions
     @:param files. files to write.
-    @:param runner_command is what isolate run within sandbox
+    @:param run_command is what isolate run within sandbox
     @:param temp_folder is where temp files will be stored
 
-    runner_command stdin file is "usercode/input_file",
+    run_command stdin file is "usercode/input_file",
     stdout "usercode/output_file" and
     stderr "usercode/error_file".
 
@@ -72,7 +72,7 @@ class DefaultSandbox:
                  memory_limit: int,
                  app_path: str,
                  files: dict,
-                 runner_command: str,
+                 run_command: str,
                  temp_folder='temp/'):
         self.app = app
         self.container_wall_timelimit = container_wall_timelimit
@@ -84,7 +84,7 @@ class DefaultSandbox:
         self.id = secrets.token_hex(16)
         self.folder = temp_folder + self.id
         self.files = files
-        self.runner_command = runner_command
+        self.run_command = run_command
         self.app.logger.info('Sandbox created')
 
     @property
@@ -107,7 +107,8 @@ class DefaultSandbox:
 
     def prepare(self):
         """
-        copying payload, usercode and input to temp directory
+        copying payload, usercode and input to temp directory and
+        setting permissions
         """
 
         # Copy payload folder at /app/payload
@@ -143,9 +144,9 @@ class DefaultSandbox:
         """
         executing usercode with given input.
         steps:
-        2. run script defaultSandboxRunScript and configuration to run using "isolate".
-        4. parse isolate meta
-        5. parse output
+        1. run script defaultSandboxRunScript and configuration to run using "isolate".
+        2. parse isolate meta
+        3. return data
 
         check meta for MLE, TLE, RE, etc...
         :return result of run as dict:
@@ -158,7 +159,7 @@ class DefaultSandbox:
                 }
         """
 
-        run_command = f'defaultSandboxRunScript.sh {self.app_path}{self.folder} {str(self.memory_limit)} {str(self.timelimit)} {self.wall_timelimit} {self.runner_command.format(self.app_path + self.folder + "/usercode")} '
+        run_command = f'defaultSandboxRunScript.sh {self.app_path}{self.folder} {str(self.memory_limit)} {str(self.timelimit)} {self.wall_timelimit} {self.run_command.format(self.app_path + self.folder + "/usercode")} '
         try:
             subprocess.run(f'{self.app_path}{self.folder}/{run_command}',
                            timeout=self.container_wall_timelimit,

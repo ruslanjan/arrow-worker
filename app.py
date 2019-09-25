@@ -42,7 +42,7 @@ def run():
                              memory_limit=memory_limit,
                              app_path=app_path,
                              files=files,
-                             runner_command=default_run_configs[data['lang']][2])
+                             run_command=default_run_configs[data['lang']][2])
     return jsonify(sandbox.run)
 
 
@@ -52,12 +52,6 @@ def custom_run():
     app_path = os.path.dirname(os.path.realpath(__file__)) + '/'
 
     container_wall_timelimit = 300
-    files = {
-        default_run_configs[data['lang']][0]: data['code'],
-        'usercode/input_file': data['stdin'],
-        'prepare.sh': default_run_configs[data['lang']][1],
-        'post.sh': default_run_configs[data['lang']][3]
-    }
 
     sandbox = DefaultSandbox(app=app,
                              container_wall_timelimit=container_wall_timelimit,
@@ -66,24 +60,8 @@ def custom_run():
                              memory_limit=data['memory_limit'],
                              app_path=app_path,
                              files=data['files'],
-                             runner_command=data['runner_command'])
+                             run_command=data['run_command'])
     return jsonify(sandbox.run)
-
-
-# def submit():
-#     data = json.loads(request.data)
-#     folder = 'temp/' + secrets.token_hex(16)
-#     vm_name = 'virtual_machine'
-#     path = os.path.dirname(os.path.realpath(__file__)) + '/'
-#
-#     container_wall_timelimit = 60
-#     wall_timelimit = 10
-#
-#     # these parameters must be provided
-#     timelimit = 2
-#     memory_limit = 256 * 1000
-#
-#     print(data)
 
 
 if __name__ == '__main__':
