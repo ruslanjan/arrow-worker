@@ -5,13 +5,16 @@ from flask import Flask, request, jsonify
 
 from arrow.run_configs import default_run_configs
 from arrow.sandbox import DefaultSandbox
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
 
 @app.route('/')
 def hello_world():
-    return open('templates/index.html').read()
+    return 'kek?'
 
 
 # public run config
