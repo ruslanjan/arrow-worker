@@ -91,7 +91,7 @@ class DefaultSandbox:
     def run(self) -> dict:
         res = self.prepare()
         # rm folder to be sure.
-        subprocess.run(f'rm -r {self.app_path}{self.folder}', shell=True)
+        subprocess.run(f'rm -rf {self.app_path}{self.folder}', shell=True)
         return res
 
     def create_and_write_to_file(self, path, data):
@@ -237,5 +237,5 @@ class DefaultSandbox:
                     continue
         except IOError:
             self.app.logger.warning('failed to open file /response_file')
-        subprocess.run(f'rm -r {self.app_path}{self.folder}', shell=True)
+        subprocess.run(f'rm -rf {self.app_path}{self.folder}', shell=True)
         return data
