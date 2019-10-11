@@ -13,8 +13,8 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def hello_world():
-    return 'kek?'
+def index():
+    return 'kek'
 
 
 # public run config
