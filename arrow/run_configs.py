@@ -7,7 +7,7 @@ default_run_configs = {
         '/usr/bin/python3 file.py',
         '''
         #!/bin/bash
-        printf "output@usercode/output_file\nerror_file@usercode/error_file" > payload_files 
+        printf "output@usercode/output_file\\nerror_file@usercode/error_file" > payload_files 
         '''
     ],
     'c++': [
@@ -24,7 +24,7 @@ default_run_configs = {
         #
         '''
         #!/bin/bash
-        printf "output@usercode/output_file\nerror_file@usercode/error_file" > payload_files 
+        printf "output@usercode/output_file\\nerror_file@usercode/error_file" > payload_files 
         '''
     ]
 }
