@@ -66,18 +66,18 @@ class DefaultSandbox:
 
     def __init__(self,
                  app: Flask,
-                 container_wall_timelimit: int,
-                 wall_timelimit: int,
-                 timelimit: int,
+                 container_wall_time_limit: int,
+                 wall_time_limit: int,
+                 time_limit: int,
                  memory_limit: int,
                  app_path: str,
                  files: dict,
                  run_command: str,
                  temp_folder='temp/'):
         self.app = app
-        self.container_wall_timelimit = container_wall_timelimit
-        self.wall_timelimit = wall_timelimit
-        self.timelimit = timelimit
+        self.container_wall_time_limit = container_wall_time_limit
+        self.wall_time_limit = wall_time_limit
+        self.time_limit = time_limit
         self.memory_limit = memory_limit
         self.app_path = app_path
         # folder were code is contained. look like: self.app_path + self.folder
@@ -159,10 +159,10 @@ class DefaultSandbox:
                 }
         """
 
-        run_command = f'defaultSandboxRunScript.sh {self.app_path}{self.folder} {str(self.memory_limit)} {str(self.timelimit)} {self.wall_timelimit} {self.run_command.format(self.app_path + self.folder + "/usercode")} '
+        run_command = f'defaultSandboxRunScript.sh {self.app_path}{self.folder} {str(self.memory_limit)} {str(self.time_limit)} {self.wall_time_limit} {self.run_command.format(self.app_path + self.folder + "/usercode")} '
         try:
             subprocess.run(f'{self.app_path}{self.folder}/{run_command}',
-                           timeout=self.container_wall_timelimit,
+                           timeout=self.container_wall_time_limit,
                            stderr=subprocess.PIPE,
                            shell=True,
                            stdout=subprocess.PIPE)

@@ -23,11 +23,11 @@ def run():
     data = json.loads(request.data)
     app_path = os.path.dirname(os.path.realpath(__file__)) + '/'
 
-    container_wall_timelimit = 300
-    wall_timelimit = 20
+    container_wall_time_limit = 300
+    wall_time_limit = 20
 
     # these parameters might be used by judge
-    timelimit = 2
+    time_limit = 2
     memory_limit = 512 * 1000
 
     files = {
@@ -38,9 +38,9 @@ def run():
     }
 
     sandbox = DefaultSandbox(app=app,
-                             container_wall_timelimit=container_wall_timelimit,
-                             wall_timelimit=wall_timelimit,
-                             timelimit=timelimit,
+                             container_wall_time_limit=container_wall_time_limit,
+                             wall_time_limit=wall_time_limit,
+                             time_limit=time_limit,
                              memory_limit=memory_limit,
                              app_path=app_path,
                              files=files,
@@ -53,12 +53,12 @@ def custom_run():
     data = json.loads(request.data)
     app_path = os.path.dirname(os.path.realpath(__file__)) + '/'
 
-    container_wall_timelimit = 300
+    container_wall_time_limit = 300
 
     sandbox = DefaultSandbox(app=app,
-                             container_wall_timelimit=container_wall_timelimit,
-                             wall_timelimit=data['wall_timelimit'],
-                             timelimit=data['time_limit'],
+                             container_wall_time_limit=container_wall_time_limit,
+                             wall_time_limit=data['wall_time_limit'],
+                             time_limit=data['time_limit'],
                              memory_limit=data['memory_limit'],
                              app_path=app_path,
                              files=data['files'],
