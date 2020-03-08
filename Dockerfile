@@ -8,15 +8,19 @@ USER root
 
 # Update the repository sources list
 # RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" > /etc/apt/sources.list
-RUN apt update -y
-RUN apt upgrade -y
-RUN apt install -y bash
-#install all the languages/compilers we are supporting.
-RUN apt install -y g++
-RUN apt install -y python
-RUN apt install -y python3
-RUN apt update -y
-RUN apt install -y python3-pip
+# also install needed deps
+RUN apt update -y && apt upgrade -y && \
+    apt install -y bash \
+                   g++ \ 
+                   python \
+                   python3 \
+                   python3-pip \
+                   curl \ 
+                   sudo \
+                   coreutils \
+                   bc \
+                   make \
+                   libcap-dev
 
 #prepare for Java download
 # RUN apt install python-software-properties
@@ -30,20 +34,14 @@ RUN apt install -y python3-pip
 #RUN apt install -y openjdk-8-jdk
 #ENV PATH="/usr/lib/jvm/java-1.8-openjdk/bin:${PATH}"
 
-RUN apt install -y curl
-
-RUN apt install -y sudo
-RUN apt install -y coreutils
-ENV PATH="/bin:${PATH}"
-RUN apt install -y bc
-RUN apt install -y make
-RUN apt install -y libcap-dev
 
 # pip3
 #RUN apt install -y python3-pip
 #RUN apt install -y patchelf
 #RUN pip3 install pyinstaller
 #RUN pip3 install staticx
+
+ENV PATH="/bin:${PATH}"
 
 RUN useradd -ms /bin/bash dummy
 # user for sandbox scripts
